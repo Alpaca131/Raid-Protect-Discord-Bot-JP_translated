@@ -67,7 +67,7 @@ class OnMessageCog(commands.Cog, name="on message"):
                             # Logs
                             i.filename = f"SPOILER_{i.filename}"
                             spoiler = await i.to_file()
-                            embed = discord.Embed(title = f"**{message.author} has sent a nudity image.**", description = f"In {message.channel.mention}.\n\n**__User informations :__**\n\n**Name :** {message.author}\n**Id :** {message.author.id}\n\n**The image :**", color = 0xff0000)
+                            embed = discord.Embed(title = f"**{message.author}がR18の画像を投稿しました。**", description = f"場所 :{message.channel.mention}.\n\n**__ユーザーの情報 :__**\n\n**名前 :** {message.author}\n**ID :** {message.author.id}\n\n**画像 :**", color = 0xff0000)
                             await sendLogMessage(self, event=message, channel=logChannel, embed=embed, messageFile=spoiler)
 
                             # embed = discord.Embed(title = f"**{message.author} has sent a nudity image.**", description = f"In {message.channel.mention}.\n\n**__User informations :__**\n\n**Name :** {message.author}\n**Id :** {message.author.id}\n\n**The image :**", color = 0xff0000)
@@ -76,7 +76,7 @@ class OnMessageCog(commands.Cog, name="on message"):
                             
                             # Delete
                             await message.delete()
-                            await message.channel.send(f"{message.author.mention} do not send nudity image !")
+                            await message.channel.send(f"{message.author.mention}、R18の画像を投稿しないで下さい！")
         
         # Data
         with open("configuration.json", "r") as config:
@@ -93,11 +93,11 @@ class OnMessageCog(commands.Cog, name="on message"):
             profanity = predict(words) # profanity2 = predict_prob(words)
             if profanity[0] == 1:
                 await message.delete() # Delete
-                await message.channel.send(f"{message.author.mention} Do not insult!")
+                await message.channel.send(f"{message.author.mention}、侮辱はやめて下さい！")
                 # Logs
                 if len(message.content) > 1600:
                     message.content = message.content + "..."
-                embed = discord.Embed(title = f"**{message.author} has sent a message with profanity.**", description = f"In {message.channel.mention}.\n\n**__User informations :__**\n\n**Name :** {message.author}\n**Id :** {message.author.id}\n\n**The message :**\n\n{message.content}", color = 0xff0000)
+                embed = discord.Embed(title = f"**{message.author}が侮辱入りのメッセージを送信しました。**", description = f"場所 :{message.channel.mention}.\n\n**__ユーザーの情報 :__**\n\n**名前 :** {message.author}\n**ID :** {message.author.id}\n\n**メッセージ :**\n\n{message.content}", color = 0xff0000)
                 await sendLogMessage(self, event=message, channel=logChannel, embed=embed)
 
         # Anti spam
@@ -117,11 +117,11 @@ class OnMessageCog(commands.Cog, name="on message"):
                 embed = discord.Embed(title = f"**YOU HAVE BEEN KICKED FROM {message.author.guild.name}**", description = f"Reason : You spammed.", color = 0xff0000)
                 await message.author.send(embed = embed)
                 await message.author.kick() # Kick the user
-                await message.channel.send(f"{message.author.mention} was kicked for spamming !")
+                await message.channel.send(f"{message.author.mention}はスパムでキックされました！")
                 
                 # Logs -> Create a hastbin file
                 logTime = datetime.now().strftime("%m/%d/%Y at %H:%M:%S")
-                logs = f"[LOGS] {self.bot.user.name.upper()} - ANTI-SPAM \n\n{message.author} ({message.author.id}) spammed in \"{message.channel}\" the {logTime}\n\n"
+                logs = f"[LOGS] {self.bot.user.name.upper()} - ANTI-SPAM \n\n{message.author} ({message.author.id})が\"{message.channel}\"で{logTime}にスパムしました。\n\n"
                 messageNumber = 0
 
                 # Get user messages
@@ -137,7 +137,7 @@ class OnMessageCog(commands.Cog, name="on message"):
                         hastbin = await hastbin.json()
                         hastbinUrl = url + "/" + hastbin['key']
                 
-                embed = discord.Embed(title = f"**{message.author} has been kicked.**", description = f"**Reason :** He spammed in {message.channel.mention}.\n\n**__User informations :__**\n\n**Name :** {message.author}\n**Id :** {message.author.id}\n\n**Logs :** {hastbinUrl}", color = 0xff0000)
+                embed = discord.Embed(title = f"**{message.author}はキックされました。**", description = f"**理由 :** {message.channel.mention}でのスパム。\n\n**__ユーザーの情報 :__**\n\n**名前 :** {message.author}\n**ID :** {message.author.id}**ログ :** {hastbinUrl}", color = 0xff0000)
                 await sendLogMessage(self, event=message, channel=logChannel, embed=embed)
 
 # ------------------------ BOT ------------------------ #  
