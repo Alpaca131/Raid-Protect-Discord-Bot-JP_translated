@@ -1,87 +1,101 @@
 import discord
-import asyncio
 import json
-import re 
+import re
 
 from discord.ext import commands
-from discord.utils import get
 from discord.ext.commands import has_permissions
 
-# ------------------------ COGS ------------------------ #  
 
-class AllowSpamCog(commands.Cog, name="allow spam command"):
+# ------------------------ COGS ------------------------ #
+
+
+class AllowSpamCog(commands.Cog, name="スパム許可コマンド"):
     def __init__(self, bot):
         self.bot = bot
 
-# ------------------------------------------------------ #  
+    # ------------------------------------------------------ #
 
-    @commands.command(name = 'allowspam', 
-                        aliases= ["spam"],
-                        usage="<#channel/ID> (remove)",
-                        description="Enable or disable the spam protection in a specific channel.")
-    @has_permissions(administrator = True)
+    # noinspection PyBroadException
+    @commands.command(name='allowspam',
+                      aliases=["spam"],
+                      usage="<#channel/ID> (remove)",
+                      description="指定したチャンネルのスパム許可・拒否を設定します。")
+    @has_permissions(administrator=True)
     @commands.cooldown(1, 3, commands.BucketType.member)
     @commands.guild_only()
-    async def allowspam(self, ctx, channel, remove="False"):
+    async def allow_spam(self, ctx, channel_id, remove="False"):
 
-        channel = re.findall(r'\d+', channel) # Get only numbers from channel
+        channel_list = re.findall(r'\d+', channel_id)  # Get only numbers from channel
+        channel_id = channel_list[0]
 
         if remove == "False":
             try:
-                channel  = int(channel)
-                spamChannel = self.bot.get_channel(channel)
+                channel_id = int(channel_id)
+                spam_channel = self.bot.get_channel(channel_id)
 
                 # Edit configuration.json
                 with open("configuration.json", "r") as config:
                     data = json.load(config)
 
-                if spamChannel.id in data["allowSpam"]:
-                    embed = discord.Embed(title=f"**ERROR**", description=f"The channel where you want to allow to spam is already ignored by anti spam.", color=0xe00000) # Red
+                if spam_channel.id in data["allowSpam"]:
+                    embed = discord.Embed(
+                        title=f"**エラー**", description=f"指定したチャンネルでは既にスパムが許可されています。", color=0xe00000)  # Red
                     embed.set_footer(text="Bot Created by Darkempire#8245")
                     return await ctx.channel.send(embed=embed)
 
-                data["allowSpam"].append(spamChannel.id)
-                newdata = json.dumps(data, indent=4, ensure_ascii=False)
+                data["allowSpam"].append(spam_channel.id)
+                new_data = json.dumps(data, indent=4, ensure_ascii=False)
 
                 with open("configuration.json", "w") as config:
-                    config.write(newdata)
-                embed = discord.Embed(title = f"**SUCCESS**", description = f"The <#{spamChannel.id}> channel is ignored by the anti spam.", color = 0x2fa737) # Green
+                    config.write(new_data)
+                embed = discord.Embed(
+                    title=f"**成功**", description=f"<#{spam_channel.id}> でのスパムを許可する設定にしました。", color=0x2fa737)  # Green
                 embed.set_footer(text="Bot Created by Darkempire#8245")
-                await ctx.channel.send(embed = embed)
+                await ctx.channel.send(embed=embed)
 
-            except:
-                embed = discord.Embed(title=f"**ERROR**", description=f"The channel where you want to allow to spam must be a channel\nFollow the example : ``{self.bot.command_prefix}allowspam <#channel>``", color=0xe00000) # Red
+            except Exception:
+                embed = discord.Embed(
+                    title=f"**エラー**",
+                    description=f"正しいチャンネルを指定してください。\n例 : ``{self.bot.command_prefix}allowspam <#channel>``",
+                    color=0xe00000)  # Red
                 embed.set_footer(text="Bot Created by Darkempire#8245")
                 return await ctx.channel.send(embed=embed)
         else:
             try:
-                channel  = int(channel)
-                spamChannel = self.bot.get_channel(channel)
+                channel_id = int(channel_id)
+                spam_channel = self.bot.get_channel(channel_id)
 
                 # Edit configuration.json
                 with open("configuration.json", "r") as config:
                     data = json.load(config)
 
-                if spamChannel.id not in data["allowSpam"]:
-                    embed = discord.Embed(title=f"**ERROR**", description=f"The channel where you want to disable the spam is already disabled.", color=0xe00000) # Red
+                if spam_channel.id not in data["allowSpam"]:
+                    embed = discord.Embed(
+                        title=f"**エラー**", description=f"指定したチャンネルでは既にスパムが禁止されています。", color=0xe00000)  # Red
                     embed.set_footer(text="Bot Created by Darkempire#8245")
                     return await ctx.channel.send(embed=embed)
 
-                data["allowSpam"].remove(spamChannel.id)
-                newdata = json.dumps(data, indent=4, ensure_ascii=False)
+                data["allowSpam"].remove(spam_channel.id)
+                new_data = json.dumps(data, indent=4, ensure_ascii=False)
 
                 with open("configuration.json", "w") as config:
-                    config.write(newdata)
-                embed = discord.Embed(title = f"**SUCCESS**", description = f"The <#{spamChannel.id}> channel is not ignored by the anti spam.", color = 0x2fa737) # Green
+                    config.write(new_data)
+                embed = discord.Embed(
+                    title=f"**成功**", description=f"<#{spam_channel.id}> でのスパムを禁止する設定にしました。", color=0x2fa737)  # Green
                 embed.set_footer(text="Bot Created by Darkempire#8245")
-                await ctx.channel.send(embed = embed)
+                await ctx.channel.send(embed=embed)
 
-            except:
-                embed = discord.Embed(title=f"**ERROR**", description=f"The channel where you want to disable the spam must be a channel\nFollow the example : ``{self.bot.command_prefix}allowspam <#channel> remove``", color=0xe00000) # Red
+            except Exception:
+                embed = discord.Embed(
+                    title=f"**エラー**",
+                    description=f"正しいチャンネルを設定してください。\n例 : ``{self.bot.command_prefix}allowspam <#channel> remove``",
+                    color=0xe00000)  # Red
                 embed.set_footer(text="Bot Created by Darkempire#8245")
                 return await ctx.channel.send(embed=embed)
 
-# ------------------------ BOT ------------------------ #  
+
+# ------------------------ BOT ------------------------ #
+
 
 def setup(bot):
     bot.add_cog(AllowSpamCog(bot))
